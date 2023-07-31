@@ -1,10 +1,62 @@
 use std::fmt::Display;
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum PieceType {
+    Pawn,
+    Knight,
+    Bishop,
+    Rook,
+    Queen,
+    King,
+}
+
+#[derive(Debug)]
+pub struct Move {
+    pub piece: PieceType,
+    pub to: BitBoard,
+    pub promotion: Option<PieceType>,
+}
+
+impl Move {
+    pub fn new(piece: PieceType, to: BitBoard, promotion: Option<PieceType>) -> Self {
+        Move {
+            piece,
+            to,
+            promotion,
+        }
+    }
+}
+
 /// Represent squares on the chess board
 /// It can be the white pieces, the kings, the squares attacked by a piece, etc.
 /// Each subsequent byte represent a row on the board, starting with row 1 (bottom to top)
+/// https://www.chessprogramming.org/Square_Mapping_Considerations#LittleEndianRankFileMapping
+#[derive(Debug, PartialEq, Eq)]
 pub struct BitBoard {
-    board: u64,
+    pub board: u64,
+}
+
+impl Display for BitBoard {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for position in 0..64 {
+            let board_position = 1 << position;
+            if self.board & board_position != 0 {
+                write!(f, "x")?;
+            } else {
+                write!(f, ".")?;
+            }
+            if position % 8 == 7 {
+                writeln!(f)?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl BitBoard {
+    pub fn new(board: u64) -> Self {
+        BitBoard { board }
+    }
 }
 
 pub struct BoardRepresentation {
@@ -89,4 +141,6 @@ impl BoardRepresentation {
         }
         type_string
     }
+
+    pub fn make_move(&mut self, m: Move) {}
 }

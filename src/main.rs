@@ -1,5 +1,25 @@
+use crate::bitboard::BoardRepresentation;
+
 mod bitboard;
+mod move_parser;
 
 fn main() {
-    println!("{:}", bitboard::BoardRepresentation::default());
+    let mut board = BoardRepresentation::default();
+    loop {
+        println!("{board}");
+        let mut input = String::new();
+        std::io::stdin().read_line(&mut input).unwrap();
+        let input = input.trim();
+        if input == "exit" {
+            break;
+        }
+        let parsed_move = move_parser::parse_move(input);
+        match parsed_move {
+            Ok(m) => {
+                println!("Move: {:}", m.to);
+                board.make_move(m);
+            }
+            Err(e) => println!("Error: {}", e),
+        }
+    }
 }
