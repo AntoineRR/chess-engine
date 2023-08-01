@@ -1,4 +1,7 @@
-use std::fmt::Display;
+use std::{
+    fmt::Display,
+    ops::{BitAnd, BitOr, BitOrAssign, Shl},
+};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum PieceType {
@@ -31,7 +34,7 @@ impl Move {
 /// It can be the white pieces, the kings, the squares attacked by a piece, etc.
 /// Each subsequent byte represent a row on the board, starting with row 1 (bottom to top)
 /// https://www.chessprogramming.org/Square_Mapping_Considerations#LittleEndianRankFileMapping
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BitBoard {
     pub board: u64,
 }
@@ -59,15 +62,57 @@ impl BitBoard {
     }
 }
 
+impl Shl<u8> for BitBoard {
+    type Output = Self;
+
+    fn shl(self, rhs: u8) -> Self::Output {
+        BitBoard {
+            board: self.board << rhs,
+        }
+    }
+}
+
+impl BitAnd for BitBoard {
+    type Output = Self;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        BitBoard {
+            board: self.board & rhs.board,
+        }
+    }
+}
+
+impl BitOr for BitBoard {
+    type Output = Self;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        BitBoard {
+            board: self.board | rhs.board,
+        }
+    }
+}
+
+impl BitOrAssign for BitBoard {
+    fn bitor_assign(&mut self, rhs: Self) {
+        self.board |= rhs.board;
+    }
+}
+
+impl PartialEq<u64> for BitBoard {
+    fn eq(&self, other: &u64) -> bool {
+        self.board == *other
+    }
+}
+
 pub struct BoardRepresentation {
-    white: BitBoard,
-    black: BitBoard,
-    kings: BitBoard,
-    queens: BitBoard,
-    rooks: BitBoard,
-    bishops: BitBoard,
-    knights: BitBoard,
-    pawns: BitBoard,
+    pub white: BitBoard,
+    pub black: BitBoard,
+    pub kings: BitBoard,
+    pub queens: BitBoard,
+    pub rooks: BitBoard,
+    pub bishops: BitBoard,
+    pub knights: BitBoard,
+    pub pawns: BitBoard,
 }
 
 impl Default for BoardRepresentation {

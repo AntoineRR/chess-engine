@@ -2,6 +2,7 @@ use crate::bitboard::BoardRepresentation;
 
 mod bitboard;
 mod move_parser;
+mod moves;
 
 fn main() {
     let mut board = BoardRepresentation::default();
