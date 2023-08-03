@@ -15,6 +15,14 @@ impl MoveGenerator for PawnMoveGenerator {
         if move_one & (board.white | board.black) == 0 && initial_position.board < 1 << 56 {
             moves.push(move_one);
         }
+        if *initial_position & 0x00_00_00_00_00_00_FF_00 != 0 {
+            let move_two = *initial_position << 16;
+            if move_two & (board.white | board.black) == 0
+                && move_one & (board.white | board.black) == 0
+            {
+                moves.push(move_two);
+            }
+        }
         moves
     }
 }
@@ -31,8 +39,9 @@ mod test {
         let generator = PawnMoveGenerator {};
         let board = BoardRepresentation::default();
         let moves = generator.generate_moves(&BitBoard::new(1 << 8), &board);
-        assert_eq!(moves.len(), 1);
+        assert_eq!(moves.len(), 2);
         assert_eq!(moves[0].board, 1 << 16);
+        assert_eq!(moves[1].board, 1 << 24);
     }
 
     #[test]
@@ -47,6 +56,18 @@ mod test {
         board.black |= BitBoard::new(1 << 16);
         let moves = generator.generate_moves(&BitBoard::new(1 << 8), &board);
         assert_eq!(moves.len(), 0);
+
+        let mut board = BoardRepresentation::default();
+        board.white |= BitBoard::new(1 << 24);
+        let moves = generator.generate_moves(&BitBoard::new(1 << 8), &board);
+        assert_eq!(moves.len(), 1);
+        assert_eq!(moves[0].board, 1 << 16);
+
+        let mut board = BoardRepresentation::default();
+        board.black |= BitBoard::new(1 << 24);
+        let moves = generator.generate_moves(&BitBoard::new(1 << 8), &board);
+        assert_eq!(moves.len(), 1);
+        assert_eq!(moves[0].board, 1 << 16);
     }
 
     #[test]

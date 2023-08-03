@@ -82,6 +82,16 @@ impl BitAnd for BitBoard {
     }
 }
 
+impl BitAnd<u64> for BitBoard {
+    type Output = Self;
+
+    fn bitand(self, rhs: u64) -> Self::Output {
+        BitBoard {
+            board: self.board & rhs,
+        }
+    }
+}
+
 impl BitOr for BitBoard {
     type Output = Self;
 
