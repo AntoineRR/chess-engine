@@ -187,5 +187,5 @@ impl BoardRepresentation {
         type_string
     }
 
-    pub fn make_move(&mut self, m: Move) {}
+    pub fn make_move(&mut self, _m: Move) {}
 }

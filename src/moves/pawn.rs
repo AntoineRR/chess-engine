@@ -12,7 +12,7 @@ impl MoveGenerator for PawnMoveGenerator {
     ) -> Vec<BitBoard> {
         let mut moves = Vec::new();
         let move_one = *initial_position << 8;
-        if move_one.clone() & (board.white | board.black) == 0 && initial_position.board < 1 << 56 {
+        if move_one & (board.white | board.black) == 0 && initial_position.board < 1 << 56 {
             moves.push(move_one);
         }
         moves

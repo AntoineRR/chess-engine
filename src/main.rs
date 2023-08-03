@@ -20,7 +20,7 @@ fn main() {
                 println!("Move: {:}", m.to);
                 board.make_move(m);
             }
-            Err(e) => println!("Error: {}", e),
+            Err(e) => println!("Error: {e}"),
         }
     }
 }
