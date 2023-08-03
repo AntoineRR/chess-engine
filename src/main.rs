@@ -17,7 +17,7 @@ fn main() {
         let parsed_move = move_parser::parse_move(input);
         match parsed_move {
             Ok(m) => {
-                println!("Move: {:}", m.to);
+                println!("Move:\n{:}", m.to);
                 board.make_move(m);
             }
             Err(e) => println!("Error: {e}"),

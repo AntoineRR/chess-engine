@@ -41,16 +41,17 @@ pub struct BitBoard {
 
 impl Display for BitBoard {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut lines = vec![[""; 8]; 8];
         for position in 0..64 {
             let board_position = 1 << position;
-            if self.board & board_position != 0 {
-                write!(f, "x")?;
+            lines[position / 8][position % 8] = if self.board & board_position != 0 {
+                "x"
             } else {
-                write!(f, ".")?;
-            }
-            if position % 8 == 7 {
-                writeln!(f)?;
-            }
+                "."
+            };
+        }
+        for line in lines.iter().rev() {
+            writeln!(f, "{}", line.join(""))?;
         }
         Ok(())
     }
@@ -130,10 +131,10 @@ impl Default for BoardRepresentation {
     fn default() -> Self {
         BoardRepresentation {
             white: BitBoard {
-                board: 0xFF_FF_00_00_00_00_00_00,
+                board: 0x00_00_00_00_00_00_FF_FF,
             },
             black: BitBoard {
-                board: 0x00_00_00_00_00_00_FF_FF,
+                board: 0xFF_FF_00_00_00_00_00_00,
             },
             kings: BitBoard {
                 board: 0x08_00_00_00_00_00_00_08,
@@ -159,43 +160,36 @@ impl Default for BoardRepresentation {
 
 impl Display for BoardRepresentation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut lines = vec![vec!["".to_string(); 8]; 8];
         for position in 0..64 {
             let board_position = 1 << position;
-            if self.white.board & board_position != 0 || self.black.board & board_position != 0 {
-                write!(f, "{}", self.get_square_display(board_position))?;
+            let mut symbol = if self.kings.board & board_position != 0 {
+                "k".to_string()
+            } else if self.queens.board & board_position != 0 {
+                "q".to_string()
+            } else if self.rooks.board & board_position != 0 {
+                "r".to_string()
+            } else if self.bishops.board & board_position != 0 {
+                "b".to_string()
+            } else if self.knights.board & board_position != 0 {
+                "n".to_string()
+            } else if self.pawns.board & board_position != 0 {
+                "p".to_string()
             } else {
-                write!(f, ".")?;
+                ".".to_string()
+            };
+            if self.white.board & board_position != 0 {
+                symbol.make_ascii_uppercase();
             }
-            if position % 8 == 7 {
-                writeln!(f)?;
-            }
+            lines[position / 8][position % 8] = symbol;
+        }
+        for line in lines.iter().rev() {
+            writeln!(f, "{}", line.join(""))?;
         }
         Ok(())
     }
 }
 
 impl BoardRepresentation {
-    pub fn get_square_display(&self, board_position: u64) -> String {
-        let mut type_string = if self.kings.board & board_position != 0 {
-            "k".to_string()
-        } else if self.queens.board & board_position != 0 {
-            "q".to_string()
-        } else if self.rooks.board & board_position != 0 {
-            "r".to_string()
-        } else if self.bishops.board & board_position != 0 {
-            "b".to_string()
-        } else if self.knights.board & board_position != 0 {
-            "n".to_string()
-        } else if self.pawns.board & board_position != 0 {
-            "p".to_string()
-        } else {
-            ".".to_string()
-        };
-        if self.white.board & board_position != 0 {
-            type_string = type_string.to_uppercase();
-        }
-        type_string
-    }
-
     pub fn make_move(&mut self, _m: Move) {}
 }
